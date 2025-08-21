@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qqcn.survey.mapper.SurveyQuestionMapper">
+    <update id="questionOrderBatchIncr">
+        update wj_survey_question
+        set order_num = order_num + ${increment}
+        where survey_id = #{surveyId}
+        <![CDATA[
+            AND order_num >= #{start}
+            AND order_num <= #{end}
+        ]]>
+        <if test="questionType == 0 ">
+            <![CDATA[
+                and question_type = 0
+            ]]>
+        </if>
+        <if test="questionType != 0 ">
+            <![CDATA[
+                and question_type > 0
+            ]]>
+        </if>
+
+    </update>
+
+    <select id="getExamineeListForEaxm" parameterType="integer" resultType="com.qqcn.survey.entity.SurveyQuestion">
+        select
+            a.*, b.user_answer
+        from wj_survey_question a, wj_survey_user_answer b
+        where a.id = b.question_id
+        and a.question_type = 0
+        and b.score_id = #{scoreId}
+        order by a.order_num
+    </select>
+
+    <select id="getQuestionListForEaxm" parameterType="integer" resultType="com.qqcn.survey.entity.SurveyQuestion">
+        select
+            a.*, b.user_answer,b.answer_valid
+        from wj_survey_question a, wj_survey_user_answer b
+        where a.id = b.question_id
+          and a.question_type > 0
+          and b.score_id = #{scoreId}
+        order by a.order_num
+    </select>
+
+</mapper>
